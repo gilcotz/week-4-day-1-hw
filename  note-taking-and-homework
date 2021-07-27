@@ -1,0 +1,254 @@
+-- Hello world SQL Query, SELECT all records from actors table
+SELECT *
+FROM actor;
+
+--query for first_name and last_name in the actor table
+SELECT first_name, last_name
+FROM actor;
+
+-- query for first_name and Last_name where the first name is equal to 'Nick' using where clause
+-- if using = it has to be the exact value between the parenthesis and cannot be use with WILDCARD %
+SELECT first_name, Last_name
+FROM actor
+WHERE first_name = 'Nick';
+
+-- query for first_name and Last_name where the first name is equal to 'Nick' using where clause
+SELECT first_name, last_name
+FROM actor
+WHERE first_name LIKE 'Nick';
+
+-- query for first/last where first name starts with a 'J' using the LIKE/WHERE clauses -WILDCARD %
+SELECT first_name, last_name
+FROM actor
+WHERE first_name LIKE 'J%';
+-- query for first/last where first name starts k and is followed by 2 more characters like/where (__underscores)
+SELECT first_name, last_name
+FROM actor
+WHERE first_name LIKE 'K__';
+
+-- query for first/last where first name starts with k, followed by 2 characters with a 'th' -combo of underscore/wildcard
+SELECT first_name, last_name
+FROM actor
+WHERE first_name LIKE 'K__%th';
+
+-- comparing operators in QSL
+-- Greater than (>) -- less than (<)
+-- Greater or equal (>=) --less or equal (<=)
+-- Not equal to (<>) same as != in python
+
+-- explore data with SELECT * Query (typically do this when changing to a new table)
+SELECT *
+FROM payment;
+
+--Query for costumer_id and amount where amount is greter than 2.00 , you can use ASC (from lowest to highest) and DESC (from highest to lowest) to order the columns
+SELECT customer_id, amount
+FROM payment
+WHERE amount > 2.00
+ORDER BY amount ASC; 
+
+-- same as above - for  amounts less than 7.99
+SELECT customer_id, amount
+FROM payment
+WHERE amount < 7.99;
+
+-- -- same as above - for  amounts less than or equal to7.99
+SELECT customer_id, amount
+FROM payment
+WHERE amount <= 7.99
+ORDER BY amount DESC; 
+
+--Query for the same data where amount is betwwen $2.00 and $7.99 ordered in Descending order
+SELECT customer_id, amount
+FROM payment
+WHERE amount BETWEEN 2.00 AND 7.99
+ORDER BY amount DESC; 
+
+--Query for sam data where amount is not equal to 0 order from lowest to highest amount 
+SELECT customer_id, amount
+FROM payment
+WHERE amount <> 0
+ORDER by amount ASC;
+
+-- SQL Aggregations => SUM(), AVG(), COUNT(),"rows", MIN(), MAX()  
+-- Query to find that sum of all payments over $5.99
+SELECT SUM(amount)
+FROM payment
+WHERE amount > 5.99;
+
+-- Query to find the average amount for all payments over $5.99
+SELECT AVG(amount)
+FROM payment
+WHERE amount > 5.99;
+
+--query to display the count of amounts paid that are greater than 5.99 
+SELECT COUNT(amount)
+FROM payment
+WHERE amount > 5.99;
+
+-- Query to find the count of unique amounts paid over 5.99
+SELECT COUNT(DISTINCT amount)
+FROM payment
+WHERE amount > 5.99;
+
+--- query to sho the minimum payment amount greater than 7.99 -- Alias column as 'MIN-payment' in output
+SELECT min(amount) AS Min_payment
+FROM payment
+WHERE amount > 7.99;
+
+--- query to sho the minimum payment amount greater than 7.99 -- Alias column as 'MIN-payment' in output
+SELECT MAX(amount) AS Max_payment
+FROM payment
+WHERE amount > 7.99;
+
+-- More specific comparison 
+SELECT amount, customer_id
+FROM payment
+WHERE amount = 7.99;
+
+--Exploratory query
+SELECT amount
+FROM payment;
+
+-- query for like amounts grouped together along wiht their total count
+SELECT amount, COUNT(amount)
+FROM payment
+GROUP BY amount
+ORDER BY amount ASC;
+
+-- query for customer_id and the total sum of all of their payment amount
+SELECT customer_id, SUM(amount)
+FROM payment
+GROUP BY customer_id
+ORDER BY SUM(amount) DESC;
+
+--Exploratory Query
+SELECT *
+FROM customer;
+
+--Exploratory to display cutomer_ids that show up more than once
+-- groupng by customer email address 
+-- HAVING is very similar to where, must be used if checking conditional with aggregator
+SELECT COUNT(Customer_id), email
+FROM customer
+GROUP BY email;
+-- HAVING COUNT(customer_id)>1;
+
+-- Query to find customers with an ID over 450 that have paid more than $100 total **good exercise**
+SELECT customer_id, SUM(amount)
+FROM payment
+WHERE customer_id > 450
+GROUP BY customer_id
+HAVING SUM(amount) >100;
+
+------------------------------------------------ Week 5 - Monday Questions----------------------------------------------
+-- 1. How many actors are there with the last name ‘Wahlberg’? 
+--There is 2 people name Wahlberg, Nick and Daryl
+SELECT *
+FROM actor
+WHERE last_name LIKE 'Wahlberg';
+
+-- 2. How many payments were made between $3.99 and $5.99?  
+--The answer is 5607 payments were made
+SELECT COUNT(amount)
+FROM payment
+WHERE amount BETWEEN 3.99 AND 5.99;
+
+-- 3. What film does the store have the most of? (search in inventory) 
+-- FOR this question I picking the first film by descent wchich is 527 with 4 in store 2 
+SELECT film_id, store_id, COUNT(*)
+FROM inventory
+GROUP BY film_id, store_id
+HAVING COUNT(*)>1
+ORDER BY COUNT(*) DESC;
+
+-- 4. How many customers have the last name ‘William’?
+-- THERE ARE 0 CUSTOMERS WITH THE LAST NAME WILLIAM BUT THERE ARE 1 CUSTOMER WITH THE LAST NAME WILLIAMS
+SELECT first_name, last_name
+FROM customer
+ORDER BY last_name DESC;
+
+-- 5. What store employee (get the id) sold the most rentals?
+-- According to sells employee with staff_id 2 sold the most with $31,059.52
+SELECT SUM(amount)
+FROM payment
+WHERE staff_id = '2';
+
+-- 6. How many different district names are there?
+-- There are 378 different district
+SELECT COUNT(DISTINCT district)
+FROM address;
+
+-- 7. What film has the most actors in it? (use film_actor table and get film_id)
+-- the most actors is in film_id with 1,000
+SELECT *
+FROM film_actor
+ORDER BY film_id DESC;
+
+-- 8. From store_id 1, how many customers have a last name ending with ‘es’? (use customer table)
+-- there are 13 last_names ending with "es"
+SELECT store_id, last_name
+FROM customer
+WHERE  last_name LIKE '%es'
+ORDER BY store_id ASC;
+
+-- 9. How many payment amounts (4.99, 5.99, etc.) had a number of rentals above 250 for customers
+-- with ids between 380 and 430? (use group by and having > 250)
+-- THERE ARE 8 RENTALS ABOVE 250 FOR CUSTOMERS.
+SELECT amount
+FROM payment
+WHERE customer_id BETWEEN 380 AND 430
+GROUP BY amount
+HAVING SUM(amount) > 250;
+
+-- 10. Within the film table, how many rating categories are there? And what rating has the most
+-- movies total?
+-- THERE ARE 5 RATING CATEGORIES G, R, PG, PG-13, NC-17. The movies that has the most ratings is PG_13. 
+SELECT COUNT(rating)
+FROM film
+WHERE rating = 'G';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
